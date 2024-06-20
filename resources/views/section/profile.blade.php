@@ -1,76 +1,12 @@
 @extends('template.app')
 @section('content')
 
-<!-- Modal section -->
-<div class="modal fade" id="section" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">{{ config('app.name') }} || Update Section</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-            @if($data->value('id'))
-            <form action="{{ route('update.section', ['id' => $data->value('id')]) }}" method="POST">
-                @csrf
-                @method('PUT')
-                <label>Section</label>
-                <select class="form-select" name="section_id" aria-label="Default select example">
-                    <option selected>== Pilih Salah Satu ==</option>
-                </select>
-            @endif
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="submit" class="btn btn-primary">Submit</button>
-        </form>
-        </div>
-      </div>
-    </div>
-  </div>
-  {{-- end modal --}}
-<!-- Modal Tambah Leader -->
-<div class="modal fade" id="tambahDepartement" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">{{ config('app.name') }} || Tambah Departement</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <form action="{{ route('profile.section.dept_post') }}" method="POST">
-                <div class="modal-body">
-                    @csrf
-                    <div class="col-md-12 mb-3">
-                        <label for="inputEmail" class="form-label">Departement</label>
-                        <select class="form-select" name="departement_id" aria-label="Default select example">
-                            <option selected disabled>== Pilih Salah Satu ==</option>
-                            @foreach ($departement as $d)
-                                <option value="{{ $d->id }}">{{ $d->user->nama }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="col-md-12">
-                        <label for="inputEmail" class="form-label">Section</label>
-                        <input type="text" class="form-control" name="section" placeholder="Masukan Nama Leader"
-                            value="{{ old('section') }}" required autofocus>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Submit</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-{{-- end modal --}}
 {{-- modal password --}}
-<form method="POST" action="{{ route('upload.mentor_vokasi', ['id' => Auth::user()->id]) }}"
+<form method="POST" action="{{ route('profile.section.put', ['id' => Auth::user()->id]) }}"
     enctype="multipart/form-data">
     @csrf
     @method('PUT')
     <input type="text" readonly name="nama" value="{{ Auth::user()->nama }}" hidden>
-    <input type="text" readonly name="no_telp" value="{{ Auth::user()->no_telp }}" hidden>
     <input type="text" readonly name="alamat" value="{{ Auth::user()->alamat }}" hidden>
     <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-xl">
@@ -94,6 +30,42 @@
                         <label for="inputEmail" class="form-label">Re-Password</label>
                         <input type="password" class="form-control" name="repassword"
                             placeholder="Masukan Kembali Password Baru" value="{{ old('repassword') }}" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Simpan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+{{-- end modal --}}
+{{-- modal Departement --}}
+<form method="POST" action="{{ route('profile.departement.put', ['id' => $data->value('id')]) }}"
+    enctype="multipart/form-data">
+    @csrf
+    @method('PUT')
+    <div class="modal fade" id="departement" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">{{ config('app.name') }} || Update Departement</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="col-md-12">
+                        <label for="inputEmail" class="form-label">Departement</label>
+                        <input type="text" class="form-control" value="{{ $data->first()->departement->user->nama }}" disabled>
+                    </div>
+                    <div class="col-md-12 mt-2">
+                        <label for="inputEmail" class="form-label">Update Departement</label>
+                        <select name="departement_id" class="form-control">
+                            <option selected disabled>== Pilih Salah Satu ==</option>
+                            @foreach ($departement as $d)
+                                <option value="{{ $d->id }}">{{ $d->user->nama }}</option>
+                            @endforeach
+                        </select>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -179,7 +151,7 @@
                                             <label for="nama">Departement :</label>
                                         </div>
                                         <div class="col-md-8">
-                                            <p id="nama">Bpk/Ibu {{ $section->departement->user->nama }}</p>
+                                            <p id="nama">Bpk/Ibu {{ $section->departement->user->nama }} <button type="button" data-bs-toggle="modal" data-bs-target="#departement" class="btn btn-info btn-xs rounded">Update</button></p>
                                         </div>
                                     </div>
                                     {{-- <div class="row">
@@ -187,7 +159,7 @@
                                             <label for="nama">Section :</label>
                                         </div>
                                         <div class="col-md-8">
-                                            <p id="nama"> asd <button type="button" data-bs-toggle="modal" data-bs-target="#section" class="btn btn-info btn-xs rounded">Update</button></p>
+                                            <p id="nama"> asd </p>
                                         </div>
                                     </div> --}}
                                     @endforeach
@@ -341,41 +313,27 @@
                 </div>
                 <div class="tab-pane" id="settings">
                     @if (!$data->isEmpty())
-                    <form method="POST" action="{{ route('upload.mentor_vokasi', ['id' => $data->value('id')]) }}"
+                    <form method="POST" action="{{ route('profile.section.put', ['id' => Auth::user()->id]) }}"
                         enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
                         @foreach ($data as $section)
-                        <input type="text" name="id" value="{{ $section->id }}" readonly hidden>
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label for="inputName" class="form-label">Nama :</label>
-                                <input type="text" class="form-control" name="nama" placeholder="Masukkan Nama"
-                                    value="{{ $section->user->nama }}" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label for="inputEmail" class="form-label">Departement : </label>
-                                <select name="" class="form-control" id="">
-                                    <option selected disabled>{{ $section->departement->user->nama }}</option>
-                                    @foreach ($departement as $d)
-                                        <option value="{{ $d->id }}">{{ $d->user->nama }}</option>
-                                    @endforeach
-                                </select>
+                                <input type="text" class="form-control" name="nama" placeholder="Masukkan Nama" value="{{ $section->user->nama }}">
                             </div>
                             <div class="col-md-6">
                                 <label for="inputEmail" class="form-label">Email :</label>
-                                <input type="email" class="form-control" name="email" placeholder="Email"
-                                    value="{{ $section->user->email }}" disabled>
+                                <input type="email" class="form-control" name="email" placeholder="Email" value="{{ $section->user->email }}" readonly>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-12">
                                 <label for="inputEmail" class="form-label">Nomor Induk : </label>
-                                <input type="text" class="form-control" name="nomor_induk" placeholder="Nomor Induk"
-                                    value="{{ $section->user->nomor_induk }}" readonly>
+                                <input type="text" class="form-control" name="nomor_induk" placeholder="Nomor Induk" value="{{ $section->user->nomor_induk }}" readonly>
                             </div>
                             <div class="col-md-12">
                                 <label for="inputEmail" class="form-label">Alamat</label>
-                                <textarea class="form-control" name="alamat"
-                                    rows="4">{{ $section->user->alamat }}</textarea>
+                                <textarea class="form-control" name="alamat" rows="4">{{ $section->user->alamat }}</textarea>
                             </div>
                             @endforeach
                             <div class="col-12">

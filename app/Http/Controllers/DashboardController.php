@@ -352,20 +352,54 @@ class DashboardController extends Controller
         ]);
     }
 
-    public function profileSection_departementPost(Request $request) {
+    public function profileDepartementput(Request $request, $id) {
         $this->validate($request, [
-            'departement_id'    => 'required',
-            'section'           => 'required'
-        ],[
-            'departement_id.required'   => 'Departement Harus diisi',
-            'section.required'          => 'Section Harus diisi'
-        ]);
+            'departement_id'    => 'required'
+        ],['departement_id.required'   => 'Departement Wajib Diisi!']);
 
-        $data = $request->all();
-        $data['user_id'] = Auth::user()->id;
-        if ($this->section->Tambah($data)) {
-            Alert::success('Berhasil', 'Data Berhasil Ditambah!');
+        if ($this->section->Ubah($id, $request->all())) {
+            Alert::success('Berhasil', 'Departement berhasil di update!');
             return redirect()->back();
         }
+    }
+
+    public function profileSection_put(Request $request, $id) {
+        $this->validate($request, [
+            'nama'              => 'required|max:60',
+            'password_lama'     => 'nullable|max:60',
+            'password'          => 'nullable|max:60',
+            'repassword'        => 'nullable|max:60|same:password',
+            'alamat'            => 'required|max:255',
+            'foto_profile'      => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048'
+        ], [
+            'foto_profile.image'    => 'Kolom foto profil harus berupa gambar.',
+            'foto_profile.mimes'    => 'Format gambar yang diterima adalah jpeg, png, jpg, gif, atau svg.',
+            'foto_profile.max'      => 'Ukuran gambar tidak boleh melebihi 2048 kilobit (2MB).',
+            'repassword.same'       => 'Konfirmasi password tidak cocok dengan password baru.'
+        ]);
+
+        $user = User::find($id);
+        $user->nama = $request->nama;
+        $user->alamat = $request->alamat;
+
+        if ($request->filled('password')) {
+            if (!Hash::check($request->password_lama, Auth::user()->password)) {
+                return redirect()->back()->withErrors('Password lama tidak sesuai.');
+            } else {
+                $user->password =  Hash::make($request->password);
+            }
+        }
+
+        if ($request->hasFile('foto_profile')) {
+            $file = $request->file('foto_profile');
+            $fileName = time() . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('assets/img/profile/'), $fileName);
+            $user->foto_profile = $fileName;
+        }
+
+        Alert::success('Berhasil', 'Profile berhasil diupdate!');
+        $user->save();
+
+        return redirect()->back();
     }
 }

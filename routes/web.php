@@ -96,7 +96,8 @@ Route::middleware('auth')->group(function () {
             Route::get('/', [DashboardController::class, 'section'])->name('dashboard.section');
             Route::prefix('profile')->group(function () {
                 Route::get('/', [DashboardController::class, 'profileSection'])->name('profile.section');
-                Route::post('section/post', [DashboardController::class, 'profileSection_departementPost'])->name('profile.section.dept_post');
+                Route::put('update/departement/{id}', [DashboardController::class, 'profileDepartementput'])->name('profile.departement.put');
+                Route::put('update/{id}', [DashboardController::class, 'profileSection_put'])->name('profile.section.put');
             });
         });
     });
